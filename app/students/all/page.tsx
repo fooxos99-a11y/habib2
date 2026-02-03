@@ -435,6 +435,21 @@ export default function AllStudentsPage() {
     )
   }
 
+  // دالة حذف الطالب
+  const handleDeleteStudent = async (studentId: string) => {
+    if (!window.confirm("هل أنت متأكد من حذف هذا الطالب؟ سيتم حذف جميع بياناته.")) return;
+    try {
+      const res = await fetch(`/api/students?id=${studentId}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchAllStudents(); // تحديث القائمة بعد الحذف
+      } else {
+        alert("حدث خطأ أثناء حذف الطالب.");
+      }
+    } catch (error) {
+      alert("حدث خطأ أثناء حذف الطالب.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -442,51 +457,24 @@ export default function AllStudentsPage() {
       <main className="flex-1 py-8 md:py-16">
         <div className="container mx-auto px-3 md:px-4">
           <div className="text-center mb-8 md:mb-16">
-            <div className="flex items-center justify-center gap-2 md:gap-4 mb-4 md:mb-6">
-              <div className="h-px w-12 sm:w-16 md:w-24 bg-gradient-to-r from-transparent to-[#d8a355]" />
-              <div
-                className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#d8a355] animate-pulse"
-                style={{ animationDuration: "2s" }}
-              />
-              <div className="h-px w-12 sm:w-16 md:w-24 bg-gradient-to-l from-transparent to-[#d8a355]" />
-            </div>
-
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-[#d8a355]/5 blur-3xl rounded-full" />
-              <h1 className="relative text-3xl md:text-5xl lg:text-6xl font-bold text-[#00312e] px-4 md:px-6 py-2 leading-tight">
-                أفضل 10 طلاب
-              </h1>
-            </div>
-
-            <div className="flex items-center justify-center gap-2 md:gap-4 mt-4 md:mt-6">
-              <div className="h-px w-12 sm:w-16 md:w-24 bg-gradient-to-r from-transparent to-[#d8a355]" />
-              <div
-                className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-[#d8a355] animate-pulse"
-                style={{ animationDuration: "2s", animationDelay: "1s" }}
-              />
-              <div className="h-px w-12 sm:w-16 md:w-24 bg-gradient-to-l from-transparent to-[#d8a355]" />
-            </div>
-
-            <p className="text-base md:text-lg text-gray-600 mt-4 md:mt-6 font-medium px-4">
-              قائمة أفضل 10 طلاب في جميع الحلقات
-            </p>
+            {/* ...existing code... */}
           </div>
 
           <TooltipProvider>
             <div className="max-w-5xl mx-auto">
               <div className="grid grid-cols-1 gap-2 md:gap-3">
                 {topStudents.map((student, index) => {
-                  const themeColors = getThemeColors(student.preferred_theme)
+                  const themeColors = getThemeColors(student.preferred_theme);
                   const cardEffect = applyCardEffect(
                     student.active_effect,
                     "group relative rounded-2xl md:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 hover:border-opacity-70",
-                  )
+                  );
                   const isPremiumTheme = ["dawn", "galaxy", "sunset_gold", "ocean_deep"].includes(
                     student.preferred_theme || "",
-                  )
+                  );
 
                   return (
-                    <div key={student.id}>
+                    <div key={student.id} className="relative">
                       <div
                         className={cardEffect.className}
                         style={{
@@ -526,81 +514,29 @@ export default function AllStudentsPage() {
 
                         <div className="p-3 md:p-6 flex items-center gap-3 md:gap-6 relative z-10">
                           <div className="relative flex-shrink-0">
-                            <svg
-                              width="45"
-                              height="52"
-                              viewBox="0 0 80 92"
-                              className="md:w-[60px] md:h-[70px] group-hover:scale-110 transition-transform duration-300"
-                            >
-                              <defs>
-                                <linearGradient id={`grad-${student.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                                  <stop offset="0%" stopColor={themeColors.primary} />
-                                  <stop offset="50%" stopColor={themeColors.secondary} />
-                                  <stop offset="100%" stopColor={themeColors.tertiary} />
-                                </linearGradient>
-                              </defs>
-                              <path
-                                d="M40 2 L75 23.5 L75 68.5 L40 90 L5 68.5 L5 23.5 Z"
-                                fill={`url(#grad-${student.id})`}
-                                stroke={themeColors.tertiary}
-                                strokeWidth="2"
-                              />
-                              <text
-                                x="40"
-                                y="55"
-                                textAnchor="middle"
-                                fill="white"
-                                fontSize="32"
-                                fontWeight="bold"
-                                fontFamily="system-ui"
-                              >
-                                {index + 1}
-                              </text>
-                            </svg>
+                            {/* ...existing code... */}
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-center gap-2 md:gap-3 mb-1 md:mb-2">
-                              <h3
-                                className="text-lg md:text-2xl font-bold transition-colors duration-300 text-[#023232] group-hover:text-[#1a3a3a]"
-                                style={{ fontFamily: getFontFamily(student.font_family) }}
-                              >
-                                {student.name}
-                              </h3>
-                              {getBadgeIcon(student.id, studentBadges) && (
-                                <div className="flex-shrink-0 scale-75 md:scale-100">
-                                  {getBadgeIcon(student.id, studentBadges)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-1 md:gap-2 justify-center mt-1 md:mt-2">
-                              {student.badges?.map((badge, idx) => (
-                                <div key={idx} className="scale-75 md:scale-100">
-                                  {renderBadge(badge)}
-                                </div>
-                              ))}
-                            </div>
+                            {/* ...existing code... */}
                           </div>
 
                           <div className="relative">
-                            <div
-                              className="flex flex-col items-center rounded-xl md:rounded-2xl px-3 py-2 md:px-6 md:py-3 shadow-inner bg-white border-2 md:border-4"
-                              style={{
-                                borderColor: themeColors.primary,
-                              }}
-                            >
-                              <div className="text-xl md:text-3xl font-bold leading-none text-[#023232]">
-                                {student.points || 0}
-                              </div>
-                              <div className="text-[10px] md:text-xs font-bold mt-0.5 md:mt-1 tracking-wide text-gray-600">
-                                نقطة
-                              </div>
-                            </div>
+                            {/* ...existing code... */}
                           </div>
+
+                          {/* زر حذف الطالب */}
+                          <button
+                            className="absolute top-2 left-2 bg-red-600 hover:bg-red-700 text-white rounded-full px-3 py-1 text-xs font-bold shadow-md z-20"
+                            title="حذف الطالب"
+                            onClick={() => handleDeleteStudent(student.id)}
+                          >
+                            حذف
+                          </button>
                         </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </div>
@@ -610,5 +546,5 @@ export default function AllStudentsPage() {
 
       <Footer />
     </div>
-  )
+  );
 }
